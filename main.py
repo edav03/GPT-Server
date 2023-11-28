@@ -33,17 +33,6 @@ assistant_id = functions.create_assistant(
 # Start conversation thread
 @app.route('/start', methods=['POST'])
 def start_conversation():
-  info = request.json
-  document_info = info.get('document_info')
-  print(f"DOCUMENT INFO: {document_info} END DOCUMENT INFO")
-
-  # create a file and write a string to it
-  with open('data_info.txt', 'w') as f:
-    f.write(document_info)
-  # read the file and print its contents
-  with open('data_info.txt', 'r') as f:
-    contents = f.read()
-
   print("Starting a new conversation...")
   thread = client.beta.threads.create()
   print(f"New thread created with ID: {thread.id}")
