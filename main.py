@@ -31,7 +31,7 @@ assistant_id = functions.create_assistant(
 
 
 # Start conversation thread
-@app.route('/start', methods=['POST'])
+@app.route('/start', methods=['GET'])
 def start_conversation():
   print("Starting a new conversation...")
   thread = client.beta.threads.create()
@@ -61,9 +61,24 @@ def chat():
   run = client.beta.threads.runs.create(thread_id=thread_id,
                                         assistant_id=assistant_id)
 
+  # Check if the Run requires action (function call)
+  while True:
+    run_status = client.beta.threads.runs.retrieve(thread_id=thread_id,
+                                                   run_id=run.id)
+    
+    # print(f"Run status: {run_status.status}")
+    if run_status.status == 'completed':
+      break
+                                        
   # Retrieve and return the latest message from the assistant
+  response = "null"
   messages = client.beta.threads.messages.list(thread_id=thread_id)
-  response = messages.data[0].content[0].text.value
+  print(f"Messages data: {messages.data}")
+  for message in reversed(messages.data):
+    if message.role == 'assistant':
+        response = message.content[0].text.value
+        break
+
 
   print(f"Assistant response: {response}")
   return jsonify({"response": response})
