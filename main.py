@@ -31,11 +31,25 @@ assistant_id = functions.create_assistant(
 
 
 # Start conversation thread
-@app.route('/start', methods=['GET'])
+@app.route('/start', methods=['POST'])
 def start_conversation():
+  data = request.json
+  general_info = data.get('general_info')
+
   print("Starting a new conversation...")
   thread = client.beta.threads.create()
   print(f"New thread created with ID: {thread.id}")
+
+  functions.write_data_to_file('prices_data.txt', general_info)
+  fileIds = functions.getFileIds(['prices_data.txt'])
+
+  # Add user context
+  client.beta.threads.messages.create(thread_id=thread.id,
+                                      role="user",
+                                      content='Mi tienda mas cercana es QuickGold Granada (Puentezuelas)',
+                                      file_ids=fileIds)
+
+  print("Thread contextualized by user")
   return jsonify({"thread_id": thread.id})
 
 
