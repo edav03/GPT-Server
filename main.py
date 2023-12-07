@@ -66,18 +66,13 @@ def chat():
     run_status = client.beta.threads.runs.retrieve(thread_id=thread_id,
                                                    run_id=run.id)
     
-    # print(f"Run status: {run_status.status}")
+    print(f"Run status: {run_status.status}")
     if run_status.status == 'completed':
       break
                                         
   # Retrieve and return the latest message from the assistant
-  response = "null"
-  messages = client.beta.threads.messages.list(thread_id=thread_id)
-  print(f"Messages data: {messages.data}")
-  for message in reversed(messages.data):
-    if message.role == 'assistant':
-        response = message.content[0].text.value
-        break
+  message = client.beta.threads.messages.list(thread_id=thread_id)
+  response = message.data[0].content[0].text.value
 
 
   print(f"Assistant response: {response}")
