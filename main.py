@@ -83,6 +83,21 @@ def chat():
     print(f"Run status: {run_status.status}")
     if run_status.status == 'completed':
       break
+    elif run_status.status == 'requires_action':
+      # Handle the function call
+      for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
+        if tool_call.function.name == "setAppointment":
+          # Process appointment creation
+          arguments = json.loads(tool_call.function.arguments)
+          output = functions.setAppointment(arguments["name"], arguments["day"], arguments["hour"])
+          client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+                                                       run_id=run.id,
+                                                       tool_outputs=[{
+                                                        "tool_call_id": tool_call.id,
+                                                        "output": output
+                                                       }])
+
+      time.sleep(0.5)  # Wait for a second before checking again
                                         
   # Retrieve and return the latest message from the assistant
   message = client.beta.threads.messages.list(thread_id=thread_id)

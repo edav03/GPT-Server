@@ -4,9 +4,15 @@ import requests
 import os
 from openai import OpenAI
 from prompts import assistant_instructions
+from email.message import EmailMessage
+import ssl
+import smtplib
 
 load_dotenv()
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
+email_sender = os.environ["EMAIL_SENDER"]
+email_password = os.environ["EMAIL_PASSWORD"]
+email_receiver = os.environ["EMAIL_RECEIVER"]
 
 # Init OpenAI Client
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -36,7 +42,32 @@ def create_assistant(client):
         tools=[
             {
                 "type": "retrieval"  # This adds the knowledge base as a tool
-            }
+            },
+            {
+              "type": "function",  # This adds the solar calculator as a tool
+              "function": {
+                  "name": "setAppointment",
+                  "description": "Set the appointment for the user",
+                  "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the user"
+                        },
+                        "day": {
+                          "type": "string",
+                          "description": "Day of the appointment"
+                        },
+                        "hour": {
+                          "type": "string",
+                          "description": "Hour of the appointment"
+                        },
+                    },
+                    "required": ["name", "day", "hour"]
+                  }
+              }
+            },
         ],
         file_ids=[file.id])
 
@@ -65,3 +96,21 @@ def getFileIds(files):
           print(f"File '{file_name}' uploaded with ID: {uploaded_file.id}")
 
   return file_ids
+
+def setAppointment(name, day, hour):
+  subject = "Cita"
+  body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}'
+
+  em = EmailMessage()
+  em['From'] = email_sender
+  em['To'] = email_receiver
+  em['Subject'] = subject
+  em.set_content(body)
+
+  context = ssl.create_default_context()
+
+  with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+    smtp.login(email_sender, email_password)
+    smtp.sendmail(email_sender, email_receiver, em.as_string())
+
+  return "Cita reservada"
