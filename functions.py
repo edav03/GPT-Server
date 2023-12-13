@@ -12,7 +12,7 @@ load_dotenv()
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 email_sender = os.environ["EMAIL_SENDER"]
 email_password = os.environ["EMAIL_PASSWORD"]
-email_receiver = os.environ["EMAIL_RECEIVER"]
+email_receiver_list = [os.environ["EMAIL_RECEIVER"], os.environ["EMAIL_RECEIVER2"]]
 
 # Init OpenAI Client
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -98,19 +98,23 @@ def getFileIds(files):
   return file_ids
 
 def setAppointment(name, day, hour):
-  subject = "Cita"
-  body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}'
+  try:
+    subject = "Cita"
+    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}'
 
-  em = EmailMessage()
-  em['From'] = email_sender
-  em['To'] = email_receiver
-  em['Subject'] = subject
-  em.set_content(body)
+    em = EmailMessage()
+    em['From'] = email_sender
+    em['To'] = email_receiver_list
+    em['Subject'] = subject
+    em.set_content(body)
 
-  context = ssl.create_default_context()
+    context = ssl.create_default_context()
 
-  with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-    smtp.login(email_sender, email_password)
-    smtp.sendmail(email_sender, email_receiver, em.as_string())
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+      smtp.login(email_sender, email_password)
+      smtp.sendmail(email_sender, email_receiver_list, em.as_string())
 
-  return "Cita reservada"
+    return "Cita reservada"
+  except Exception as e:
+        print(f"An error occurred: {e}")
+        return "Error al reservar la cita"

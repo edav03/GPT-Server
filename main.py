@@ -69,12 +69,12 @@ def chat():
 
   print(f"Received message: {user_input} for thread ID: {thread_id}")
 
-  # Add the user's message to the thread
+  print("Add the user's message to the thread...")
   client.beta.threads.messages.create(thread_id=thread_id,
                                       role="user",
                                       content=user_input)
 
-  # Run the Assistant
+  print("Running the assistant...")
   run = client.beta.threads.runs.create(thread_id=thread_id,
                                         assistant_id=assistant_id)
 
@@ -105,7 +105,6 @@ def chat():
   # Retrieve and return the latest message from the assistant
   message = client.beta.threads.messages.list(thread_id=thread_id)
   response = message.data[0].content[0].text.value
-
 
   print(f"Assistant response: {response}")
   return jsonify({"response": response})
