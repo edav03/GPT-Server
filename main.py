@@ -26,8 +26,11 @@ app = Flask(__name__)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Create or load assistant
-assistant_id = functions.create_assistant(
-    client)  # this function comes from "functions.py"
+assistant_id = functions.create_assistant(client)  # this function comes from "functions.py"
+
+@app.route('/', methods=['GET'])
+def checkServer():
+  return jsonify({"status": 'Server running'})
 
 
 # Start conversation thread

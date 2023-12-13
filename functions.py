@@ -44,7 +44,7 @@ def create_assistant(client):
                 "type": "retrieval"  # This adds the knowledge base as a tool
             },
             {
-              "type": "function",  # This adds the solar calculator as a tool
+              "type": "function",  # This adds the setAppointment() as a tool
               "function": {
                   "name": "setAppointment",
                   "description": "Set the appointment for the user",
