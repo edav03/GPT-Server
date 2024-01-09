@@ -47,24 +47,28 @@ def create_assistant(client):
               "type": "function",  # This adds the setAppointment() as a tool
               "function": {
                   "name": "setAppointment",
-                  "description": "Set the appointment for the user",
+                  "description": "Confirma la reserva una cita",
                   "parameters": {
                     "type": "object",
                     "properties": {
                         "name": {
                           "type": "string",
-                          "description": "Name of the user"
+                          "description": "Nombre del usuario"
                         },
                         "day": {
                           "type": "string",
-                          "description": "Day of the appointment"
+                          "description": "Dia que tendrá lugar la cita"
                         },
                         "hour": {
                           "type": "string",
-                          "description": "Hour of the appointment"
+                          "description": "Hora que tendrá lugar la cita"
                         },
+                        "phone":{
+                          "type": "string",
+                          "description": "Numero de telefono del usuario"
+                        }
                     },
-                    "required": ["name", "day", "hour"]
+                    "required": ["name", "day", "hour", "phone"]
                   }
               }
             },
@@ -97,10 +101,10 @@ def getFileIds(files):
 
   return file_ids
 
-def setAppointment(name, day, hour):
+def setAppointment(name, day, hour, phone):
   try:
     subject = "Cita"
-    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}'
+    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}. Numero tlf: {phone}'
 
     em = EmailMessage()
     em['From'] = email_sender

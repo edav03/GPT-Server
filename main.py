@@ -92,7 +92,7 @@ def chat():
         if tool_call.function.name == "setAppointment":
           # Process appointment creation
           arguments = json.loads(tool_call.function.arguments)
-          output = functions.setAppointment(arguments["name"], arguments["day"], arguments["hour"])
+          output = functions.setAppointment(arguments["name"], arguments["day"], arguments["hour"], arguments["phone"])
           client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
                                                        run_id=run.id,
                                                        tool_outputs=[{
