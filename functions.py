@@ -66,9 +66,13 @@ def create_assistant(client):
                         "phone":{
                           "type": "string",
                           "description": "Numero de telefono del usuario"
+                        },
+                        "summary":{
+                          "type": "string",
+                          "description": "Resumen de la conversación en español"
                         }
                     },
-                    "required": ["name", "day", "hour", "phone"]
+                    "required": ["name", "day", "hour", "phone", "summary"]
                   }
               }
             },
@@ -101,10 +105,10 @@ def getFileIds(files):
 
   return file_ids
 
-def setAppointment(name, day, hour, phone):
+def setAppointment(name, day, hour, phone, summary):
   try:
     subject = "Cita"
-    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}. Numero tlf: {phone}'
+    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}. Numero tlf: {phone}. Resumen de la conversacion: {summary}'
 
     em = EmailMessage()
     em['From'] = email_sender
