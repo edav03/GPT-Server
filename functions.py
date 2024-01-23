@@ -26,7 +26,7 @@ def create_assistant(client):
     with open(assistant_file_path, 'r') as file:
       assistant_data = json.load(file)
       assistant_id = assistant_data['assistant_id']
-      print("Loaded existing assistant ID.")
+      print(f"Loaded existing assistant ID: {assistant_id}")
   else:
     # If no assistant.json is present, create a new assistant using the below specifications
 
@@ -82,7 +82,7 @@ def create_assistant(client):
     # Create a new assistant.json file to load on future runs
     with open(assistant_file_path, 'w') as file:
       json.dump({'assistant_id': assistant.id}, file)
-      print("Created a new assistant and saved the ID.")
+      print(f"Created a new assistant and saved the ID: {assistant.id}")
 
     assistant_id = assistant.id
 
@@ -117,6 +117,8 @@ def setAppointment(name, day, hour, phone, summary):
     em.set_content(body)
 
     context = ssl.create_default_context()
+
+    print(f"Mensaje email: {body}");
 
     with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
       smtp.login(email_sender, email_password)
