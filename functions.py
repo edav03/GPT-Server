@@ -12,7 +12,7 @@ load_dotenv()
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 email_sender = os.environ["EMAIL_SENDER"]
 email_password = os.environ["EMAIL_PASSWORD"]
-email_receiver_list = [os.environ["EMAIL_RECEIVER"], os.environ["EMAIL_RECEIVER2"]]
+email_receiver_list = [os.environ["EMAIL_RECEIVER"], os.environ["EMAIL_RECEIVER2"], os.environ["EMAIL_RECEIVER3"]]
 
 # Init OpenAI Client
 client = OpenAI(api_key=OPENAI_API_KEY)
