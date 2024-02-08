@@ -49,8 +49,12 @@ def start_conversation():
   # Add user context
   client.beta.threads.messages.create(thread_id=thread.id,
                                       role="user",
-                                      content='Mi tienda mas cercana es QuickGold Granada (Puentezuelas)',
-                                      file_ids=fileIds)
+                                      content='La tienda mas cercana al usuario es QuickGold Granada (Puentezuelas) y te adjunto el documento que contiene los datos del valor del oro, de la plata, y del cambio de divisa',
+                                      file_ids=fileIds,
+                                      metadata={
+                                        "type":"hidden"
+                                      }
+                                    )
 
   print("Thread contextualized by user")
   return jsonify({"thread_id": thread.id})
@@ -101,6 +105,12 @@ def chat():
                                                        }])
 
       time.sleep(0.5)  # Wait for a second before checking again
+    elif run_status.status == 'failed':
+        print("The run has failed.")
+        print(run_status.last_error);
+        functions.emailTheError(run_status.last_error, assistant_id)
+        
+        return jsonify({"response": "Estamos experimentando problemas, porfavor no dudes en llamarnos al 900 373 629 o en acudir a tu tienda QuickGold más cercana. Estaremos encantados de ayudarte en lo que necesites!"})
                                         
   # Retrieve and return the latest message from the assistant
   message = client.beta.threads.messages.list(thread_id=thread_id)

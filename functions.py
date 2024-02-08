@@ -1,5 +1,6 @@
 import json
 from dotenv import load_dotenv
+from urllib.parse import unquote
 import requests
 import os
 from openai import OpenAI
@@ -12,7 +13,9 @@ load_dotenv()
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 email_sender = os.environ["EMAIL_SENDER"]
 email_password = os.environ["EMAIL_PASSWORD"]
-email_receiver_list = [os.environ["EMAIL_RECEIVER"], os.environ["EMAIL_RECEIVER2"], os.environ["EMAIL_RECEIVER3"]]
+email_developer = os.environ["EMAIL_DEVELOPER"]
+email_clara = os.environ["EMAIL_RECEIVER2"]
+email_receiver_list = [os.environ["EMAIL_RECEIVER"], email_clara, email_developer]
 
 # Init OpenAI Client
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -108,11 +111,41 @@ def getFileIds(files):
 def setAppointment(name, day, hour, phone, summary):
   try:
     subject = "Cita"
-    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}. Numero tlf: {phone}. Resumen de la conversacion: {summary}'
+    body = f'Nueva cita a las {hour} horas el dia {day}, a nombre de {name}.\nNumero tlf: {phone}.\nResumen de la conversacion: {summary}'
+    decoded_body = unquote(body);
+
+    # If you need to encode for some other reason (e.g., writing to a file, sending over a network)
+    encoded_body = decoded_body.encode('utf-8')
+
+    # Decoding (if you have an encoded byte string and want to get a regular string)
+    decoded_again = encoded_body.decode('utf-8')
 
     em = EmailMessage()
     em['From'] = email_sender
     em['To'] = email_receiver_list
+    em['Subject'] = subject
+    em.set_content(decoded_again, charset='utf-8')
+
+    context = ssl.create_default_context()
+
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+      smtp.login(email_sender, email_password)
+      smtp.sendmail(email_sender, email_receiver_list, em.as_string().encode('utf-8'))
+
+    return "Cita reservada"
+  except Exception as e:
+        print(f"An error occurred: {e}")
+        return "Error al reservar la cita"
+
+def emailTheError(errorMessage, assistantId):
+  try:
+    subject = "Script Error"
+    body = f'{errorMessage}\n{assistantId}'
+
+    em = EmailMessage()
+    em['From'] = email_sender
+    em['To'] = [email_developer, email_clara]
     em['Subject'] = subject
     em.set_content(body)
 
